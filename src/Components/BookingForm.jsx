@@ -20,7 +20,8 @@ function BookingForm({ details }) {
 
     const formattedDate = selectedDate.toISOString().split("T")[0];
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/appointments/book";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/appointments/book";
     try {
       const response = await axios.post(
         url,
@@ -56,7 +57,8 @@ function BookingForm({ details }) {
     console.log(appointmentType);
 
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/appointments/check-availability";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/appointments/check-availability";
     if (!selectedDate || !selectedTime) {
       return toast.error("Date and time fields can't be left blank", {
         autoClose: 2000,

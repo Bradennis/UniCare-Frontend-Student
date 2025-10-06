@@ -59,7 +59,7 @@ const UserInfoPage = ({ details }) => {
             <img
               src={
                 details?.img
-                  ? `http://localhost:3000/profImages/${details?.img}`
+                  ? `${import.meta.env.VITE_API_URL}/profImages/${details?.img}`
                   : prof
               }
               alt=''

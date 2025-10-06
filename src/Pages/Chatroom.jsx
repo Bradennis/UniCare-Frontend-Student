@@ -25,7 +25,7 @@ import Person from "../Components/Profile";
 import { MdDescription } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = import.meta.env.VITE_API_URL;
 let socket, compareChat;
 
 // Debounce function definition
@@ -146,12 +146,13 @@ const Chatroom = () => {
     formData3.append("video", videoFile);
     formData4.append("image", imageFile);
 
-    const urlResources = "http://localhost:3000/library/resources";
+    const urlResources = import.meta.env.VITE_API_URL + "/library/resources";
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/chats/sendVoiceNote";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/chats/sendVoiceNote";
 
     const urlSendMessage =
-      "http://localhost:3000/knust.students/wellnesshub/chats/send";
+      import.meta.env.VITE_API_URL + "/knust.students/wellnesshub/chats/send";
 
     // for voice note
     if (audioBlob) {
@@ -288,7 +289,8 @@ const Chatroom = () => {
 
   // clicking and selecting a user to chat with on the left side bar
   const handleChatSelect = async (id) => {
-    const url = "http://localhost:3000/knust.students/wellnesshub/chats";
+    const url =
+      import.meta.env.VITE_API_URL + "/knust.students/wellnesshub/chats";
     try {
       const result = await axios.post(
         url,
@@ -320,7 +322,9 @@ const Chatroom = () => {
     debounce(async (query) => {
       try {
         const result = await axios.get(
-          `http://localhost:3000/knust.students/wellnesshub/tasks/getProfs?search=${query}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/knust.students/wellnesshub/tasks/getProfs?search=${query}`,
           { withCredentials: true }
         );
         setUsers(result.data);
@@ -407,7 +411,11 @@ const Chatroom = () => {
                     <div className='single-user'>
                       <Person
                         img={
-                          img ? `http://localhost:3000/profImages/${img}` : prof
+                          img
+                            ? `${
+                                import.meta.env.VITE_API_URL
+                              }/profImages/${img}`
+                            : prof
                         }
                       />
                       <div className='msg-txt-time'>

@@ -8,7 +8,7 @@ import { GlobalContext } from "../Context/ContextApi";
 import axios from "axios";
 import io from "socket.io-client";
 
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = import.meta.env.VITE_API_URL;
 let socket;
 
 // Debounce function definition
@@ -42,7 +42,9 @@ const Sidebar = () => {
     debounce(async (query) => {
       try {
         const result = await axios.get(
-          `http://localhost:3000/knust.students/wellnesshub/tasks/getusers?search=${query}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/knust.students/wellnesshub/tasks/getusers?search=${query}`,
           { withCredentials: true }
         );
         setUsers(result.data);
@@ -62,7 +64,8 @@ const Sidebar = () => {
   };
 
   const handleChatSelect = async (id) => {
-    const url = "http://localhost:3000/knust.students/wellnesshub/chats";
+    const url =
+      import.meta.env.VITE_API_URL + "/knust.students/wellnesshub/chats";
     try {
       const result = await axios.post(
         url,
@@ -126,7 +129,11 @@ const Sidebar = () => {
               >
                 <div className='single-user'>
                   <Person
-                    img={img ? `http://localhost:3000/profImages/${img}` : prof}
+                    img={
+                      img
+                        ? `${import.meta.env.VITE_API_URL}/profImages/${img}`
+                        : prof
+                    }
                   />
                   <div className='msg-txt-time'>
                     <div className='person-txt-info'>

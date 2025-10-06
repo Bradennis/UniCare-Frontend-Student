@@ -14,7 +14,7 @@ import { GlobalContext } from "../Context/ContextApi";
 import axios from "axios";
 
 let socket;
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = import.meta.env.VITE_API_URL;
 
 const MessageRoom = () => {
   const [message, setMessage] = useState("");
@@ -22,8 +22,8 @@ const MessageRoom = () => {
   const { chat, setChat } = useContext(GlobalContext);
 
   // useEffect(() => {
-  //   socket = io.connect("http://localhost:3000");
-
+  //   socket = io.connect(import.meta.env.VITE_API_URL);
+  //
   //   // Cleanup function to avoid multiple event listeners
   //   return () => {
   //     socket.off("message received");
@@ -38,7 +38,8 @@ const MessageRoom = () => {
       return;
     }
 
-    const url = "http://localhost:3000/knust.students/wellnesshub/chats/send";
+    const url =
+      import.meta.env.VITE_API_URL + "/knust.students/wellnesshub/chats/send";
 
     try {
       const result = await axios.post(

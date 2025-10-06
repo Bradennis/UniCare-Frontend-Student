@@ -51,7 +51,8 @@ const Library = () => {
 
   const handleAccess = async (_id) => {
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources/access";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/tasks/library/resources/access";
     try {
       await axios.post(url, { _id }, { withCredentials: true });
     } catch (error) {
@@ -61,7 +62,8 @@ const Library = () => {
 
   const handleFavorites = async (_id) => {
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources/favorites";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/tasks/library/resources/favorites";
     try {
       await axios.post(url, { _id }, { withCredentials: true });
     } catch (error) {
@@ -71,7 +73,8 @@ const Library = () => {
 
   const handleAccessRemove = async (resourceId) => {
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/tasks/library/access/remove";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/tasks/library/access/remove";
     try {
       const result = await axios.post(
         url,
@@ -94,7 +97,8 @@ const Library = () => {
   // like function here
   const handleLike = async (_id) => {
     const url =
-      "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources/likes";
+      import.meta.env.VITE_API_URL +
+      "/knust.students/wellnesshub/tasks/library/resources/likes";
 
     try {
       await axios.post(url, { _id }, { withCredentials: true });
@@ -136,7 +140,8 @@ const Library = () => {
   useEffect(() => {
     const getLibraryResources = async () => {
       const result = await axios.get(
-        "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources",
+        import.meta.env.VITE_API_URL +
+          "/knust.students/wellnesshub/tasks/library/resources",
         { withCredentials: true }
       );
 
@@ -149,7 +154,8 @@ const Library = () => {
     const fetchDetails = async () => {
       try {
         const result = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/userdetails",
           { withCredentials: true }
         );
 
@@ -166,7 +172,8 @@ const Library = () => {
   useEffect(() => {
     const getLibraryResources = async () => {
       const result = await axios.get(
-        "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources",
+        import.meta.env.VITE_API_URL +
+          "/knust.students/wellnesshub/tasks/library/resources",
         { withCredentials: true }
       );
       setFiles([...files, result.data.recentUpdates]);
@@ -231,7 +238,9 @@ const Library = () => {
                     <Person
                       img={
                         user?.img
-                          ? `http://localhost:3000/profImages/${user.img}`
+                          ? `${import.meta.env.VITE_API_URL}/profImages/${
+                              user.img
+                            }`
                           : prof
                       }
                     />
@@ -268,7 +277,9 @@ const Library = () => {
                       <Person
                         img={
                           user?.img
-                            ? `http://localhost:3000/profImages/${user.img}`
+                            ? `${import.meta.env.VITE_API_URL}/profImages/${
+                                user.img
+                              }`
                             : prof
                         }
                       />
@@ -470,7 +481,9 @@ const Library = () => {
                               style={{ width: "100%", height: "250px" }}
                             >
                               <source
-                                src={`http://localhost:3000/videoFiles/${vid}`}
+                                src={`${
+                                  import.meta.env.VITE_API_URL
+                                }/videoFiles/${vid}`}
                                 type='video/webm'
                               />
                             </Video>
@@ -478,7 +491,9 @@ const Library = () => {
                             <div>
                               {img ? (
                                 <img
-                                  src={`http://localhost:3000/imageFiles/${img}`}
+                                  src={`${
+                                    import.meta.env.VITE_API_URL
+                                  }/imageFiles/${img}`}
                                   alt=''
                                 />
                               ) : (
@@ -503,7 +518,9 @@ const Library = () => {
                         </div>
                         <div className='file-txt'>
                           <Person
-                            img={`http://localhost:3000/profImages/${prof}`}
+                            img={`${
+                              import.meta.env.VITE_API_URL
+                            }/profImages/${prof}`}
                           />
                           <div
                             className='resource-side-info'

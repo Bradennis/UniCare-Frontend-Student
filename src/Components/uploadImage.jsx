@@ -17,7 +17,9 @@ function UploadImage() {
       <div className='infoBox'>
         <div className='imgBox'>
           <img
-            src={instImage ? `http://localhost:3000/ ${instImage}` : img}
+            src={
+              instImage ? `${import.meta.env.VITE_API_URL}/${instImage}` : img
+            }
             alt='image'
           />
         </div>

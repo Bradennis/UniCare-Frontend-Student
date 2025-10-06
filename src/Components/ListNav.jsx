@@ -18,12 +18,14 @@ function ListNav() {
     const fetchDetails = async () => {
       try {
         const doc = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/getdoctors",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/getdoctors",
           { withCredentials: true }
         );
 
         const couns = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/getcounsellors",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/getcounsellors",
           { withCredentials: true }
         );
 
@@ -74,7 +76,9 @@ function ListNav() {
                         <Person
                           img={
                             img
-                              ? `http://localhost:3000/profImages/${img}`
+                              ? `${
+                                  import.meta.env.VITE_API_URL
+                                }/profImages/${img}`
                               : prof
                           }
                         />
@@ -100,7 +104,9 @@ function ListNav() {
                         <Person
                           img={
                             img
-                              ? `http://localhost:3000/profImages/${img}`
+                              ? `${
+                                  import.meta.env.VITE_API_URL
+                                }/profImages/${img}`
                               : prof
                           }
                         />
@@ -134,7 +140,9 @@ function ListNav() {
                   <img
                     src={
                       doctors[index]?.img
-                        ? `http://localhost:3000/profImages/${doctors[index]?.img}`
+                        ? `${import.meta.env.VITE_API_URL}/profImages/${
+                            doctors[index]?.img
+                          }`
                         : prof
                     }
                     alt='profile Picture'
@@ -158,7 +166,9 @@ function ListNav() {
                   <img
                     src={
                       counsellors[index]?.img
-                        ? `http://localhost:3000/profImages/${counsellors[index]?.img}`
+                        ? `${import.meta.env.VITE_API_URL}/profImages/${
+                            counsellors[index]?.img
+                          }`
                         : prof
                     }
                     alt='profile Picture'

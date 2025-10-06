@@ -41,7 +41,8 @@ const SingleResource = () => {
 
     try {
       const url =
-        "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources/comments";
+        import.meta.env.VITE_API_URL +
+        "/knust.students/wellnesshub/tasks/library/resources/comments";
       const _id = roughFiles[fileIndex]?._id;
       const result = await axios.post(
         url,
@@ -159,7 +160,9 @@ const SingleResource = () => {
             <div className='single-Resource-prof'>
               <div className='single-Resource-prof-leftside'>
                 <Person
-                  img={`http://localhost:3000/profImages/${roughFiles[fileIndex]?.prof}`}
+                  img={`${import.meta.env.VITE_API_URL}/profImages/${
+                    roughFiles[fileIndex]?.prof
+                  }`}
                 />
                 <p className='author' style={{ marginTop: "10px" }}>
                   {roughFiles[fileIndex]?.author}
@@ -197,7 +200,9 @@ const SingleResource = () => {
               {roughFiles[fileIndex]?.img && (
                 <>
                   <img
-                    src={`http://localhost:3000/imageFiles/${roughFiles[fileIndex]?.img}`}
+                    src={`${import.meta.env.VITE_API_URL}/imageFiles/${
+                      roughFiles[fileIndex]?.img
+                    }`}
                     alt=''
                     style={{ width: "100%" }}
                   />
@@ -205,7 +210,9 @@ const SingleResource = () => {
                     className='download-btn'
                     onClick={() =>
                       handleDownload(
-                        `http://localhost:3000/imageFiles/${roughFiles[fileIndex]?.img}`,
+                        `${import.meta.env.VITE_API_URL}/imageFiles/${
+                          roughFiles[fileIndex]?.img
+                        }`,
                         roughFiles[fileIndex]?.img
                       )
                     }
@@ -226,7 +233,9 @@ const SingleResource = () => {
                     style={{ width: "100%", height: "100%" }}
                   >
                     <source
-                      src={`http://localhost:3000/videoFiles/${roughFiles[fileIndex]?.vid}`}
+                      src={`${import.meta.env.VITE_API_URL}/videoFiles/${
+                        roughFiles[fileIndex]?.vid
+                      }`}
                       type='video/webm'
                     />
                   </Video>
@@ -234,7 +243,9 @@ const SingleResource = () => {
                     className='download-btn'
                     onClick={() =>
                       handleDownload(
-                        `http://localhost:3000/videoFiles/${roughFiles[fileIndex]?.vid}`,
+                        `${import.meta.env.VITE_API_URL}/videoFiles/${
+                          roughFiles[fileIndex]?.vid
+                        }`,
                         roughFiles[fileIndex]?.vid
                       )
                     }
@@ -260,7 +271,9 @@ const SingleResource = () => {
                     className='download-btn'
                     onClick={() =>
                       handleDownload(
-                        `http://localhost:3000/docFiles/${roughFiles[fileIndex]?.pdf}`,
+                        `${import.meta.env.VITE_API_URL}/docFiles/${
+                          roughFiles[fileIndex]?.pdf
+                        }`,
                         roughFiles[fileIndex]?.pdf
                       )
                     }
@@ -277,7 +290,9 @@ const SingleResource = () => {
                 <>
                   <audio controls>
                     <source
-                      src={`http://localhost:3000/audioFiles/${roughFiles[fileIndex]?.audio}`}
+                      src={`${import.meta.env.VITE_API_URL}/audioFiles/${
+                        roughFiles[fileIndex]?.audio
+                      }`}
                       type='audio/mp3'
                     ></source>
                   </audio>
@@ -286,7 +301,9 @@ const SingleResource = () => {
                     className='download-btn'
                     onClick={() =>
                       handleDownload(
-                        `http://localhost:3000/audioFiles/${roughFiles[fileIndex]?.audio}`,
+                        `${import.meta.env.VITE_API_URL}/audioFiles/${
+                          roughFiles[fileIndex]?.audio
+                        }`,
                         roughFiles[fileIndex]?.audio
                       )
                     }
@@ -324,7 +341,9 @@ const SingleResource = () => {
                     <div className='single-Resource-prof'>
                       <div className='single-Resource-prof-leftside'>
                         <Person
-                          img={`http://localhost:3000/profImages/${commentProf}`}
+                          img={`${
+                            import.meta.env.VITE_API_URL
+                          }/profImages/${commentProf}`}
                         />
                         <p style={{ marginTop: "10px", fontWeight: "bold" }}>
                           {name}

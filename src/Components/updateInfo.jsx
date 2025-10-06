@@ -41,7 +41,7 @@ function Updateinfo() {
     if (image) {
       const formData = new FormData();
       formData.append("profImage", image);
-      const url = "http://localhost:3000/upload";
+      const url = import.meta.env.VITE_API_URL + "/upload";
 
       try {
         const result = await axios.post(url, formData, {
@@ -69,7 +69,8 @@ function Updateinfo() {
 
     try {
       const result = await axios.post(
-        "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
+        import.meta.env.VITE_API_URL +
+          "/knust.students/wellnesshub/tasks/userdetails",
         {
           username,
           schoolVoda,
@@ -101,7 +102,8 @@ function Updateinfo() {
     const fetchDetails = async () => {
       try {
         const result = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/userdetails",
           { withCredentials: true }
         );
 
@@ -123,7 +125,7 @@ function Updateinfo() {
             <img
               src={
                 details.img
-                  ? `http://localhost:3000/profImages/${profImage}`
+                  ? `${import.meta.env.VITE_API_URL}/profImages/${profImage}`
                   : prof
               }
               alt='image'

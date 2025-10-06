@@ -15,7 +15,8 @@ function PageNav() {
     const fetchDetails = async () => {
       try {
         const result = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/userdetails",
           { withCredentials: true }
         );
 
@@ -40,7 +41,9 @@ function PageNav() {
         <div className='profileContainer'>
           <img
             src={
-              user?.img ? `http://localhost:3000/profImages/${user.img}` : prof
+              user?.img
+                ? `${import.meta.env.VITE_API_URL}/profImages/${user.img}`
+                : prof
             }
             alt=''
             style={{ objectFit: "cover", width: "50px", borderRadius: "7px" }}

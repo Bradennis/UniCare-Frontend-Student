@@ -42,7 +42,7 @@ const SingleChat = ({
       {voiceNote && (
         <audio
           controls
-          src={`http://localhost:3000/audioFiles/${voiceNote}`}
+          src={`${import.meta.env.VITE_API_URL}/audioFiles/${voiceNote}`}
           type='audio/mp3'
           className={sender._id === currentUser._id ? "text-Box" : "text-Box1"}
           style={{ cursor: "pointer" }}
@@ -52,7 +52,7 @@ const SingleChat = ({
       {aud && (
         <audio
           controls
-          src={`http://localhost:3000/audioFiles/${aud}`}
+          src={`${import.meta.env.VITE_API_URL}/audioFiles/${aud}`}
           className={sender._id === currentUser._id ? "text-Box" : "text-Box1"}
           style={{ cursor: "pointer" }}
         ></audio>
@@ -62,7 +62,7 @@ const SingleChat = ({
         <div style={{ borderRadius: "10px" }}>
           <Video loop poster='' style={{ width: "300px" }}>
             <source
-              src={`http://localhost:3000/videoFiles/${vid}`}
+              src={`${import.meta.env.VITE_API_URL}/videoFiles/${vid}`}
               type='video/webm'
             />
           </Video>
@@ -72,7 +72,7 @@ const SingleChat = ({
       {img && (
         <div>
           <img
-            src={`http://localhost:3000/imageFiles/${img}`}
+            src={`${import.meta.env.VITE_API_URL}/imageFiles/${img}`}
             alt=''
             width={300}
             style={{ borderRadius: "10px" }}

@@ -36,7 +36,8 @@ const Sidebar = () => {
     const fetchDetails = async () => {
       try {
         const result = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
+          import.meta.env.VITE_API_URL +
+            "/knust.students/wellnesshub/tasks/userdetails",
           { withCredentials: true }
         );
 
@@ -93,7 +94,7 @@ const Sidebar = () => {
                 <Person
                   img={
                     user?.img
-                      ? `http://localhost:3000/profImages/${user.img}`
+                      ? `${import.meta.env.VITE_API_URL}/profImages/${user.img}`
                       : prof
                   }
                 />

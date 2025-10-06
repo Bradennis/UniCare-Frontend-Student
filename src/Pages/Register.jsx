@@ -33,8 +33,9 @@ const Register = () => {
 
     setIsLoading(true);
     const url = register
-      ? "http://localhost:3000/knust.students/wellnesshub/auth/register"
-      : "http://localhost:3000/knust.students/wellnesshub/auth/login";
+      ? import.meta.env.VITE_API_URL +
+        "/knust.students/wellnesshub/auth/register"
+      : import.meta.env.VITE_API_URL + "/knust.students/wellnesshub/auth/login";
 
     const { username, staff_id, student_id, password, email } = details;
 

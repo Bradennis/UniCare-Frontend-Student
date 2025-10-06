@@ -33,12 +33,14 @@ const CheckAppointment = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       const pending = await axios.get(
-        "http://localhost:3000/knust.students/wellnesshub/appointments/pending",
+        import.meta.env.VITE_API_URL +
+          "/knust.students/wellnesshub/appointments/pending",
         { withCredentials: true }
       );
 
       const appointments = await axios.get(
-        "http://localhost:3000/knust.students/wellnesshub/appointments/appointments",
+        import.meta.env.VITE_API_URL +
+          "/knust.students/wellnesshub/appointments/appointments",
         { withCredentials: true }
       );
       setAppointments(appointments.data.appointments);
@@ -139,7 +141,9 @@ const CheckAppointment = () => {
                             <Person
                               img={
                                 img
-                                  ? `http://localhost:3000/profImages/${img}`
+                                  ? `${
+                                      import.meta.env.VITE_API_URL
+                                    }/profImages/${img}`
                                   : prof
                               }
                             />
@@ -250,7 +254,9 @@ const CheckAppointment = () => {
                               <Person
                                 img={
                                   img
-                                    ? `http://localhost:3000/profImages/${img}`
+                                    ? `${
+                                        import.meta.env.VITE_API_URL
+                                      }/profImages/${img}`
                                     : prof
                                 }
                               />
@@ -366,7 +372,9 @@ const CheckAppointment = () => {
                               <Person
                                 img={
                                   img
-                                    ? `http://localhost:3000/profImages/${img}`
+                                    ? `${
+                                        import.meta.env.VITE_API_URL
+                                      }/profImages/${img}`
                                     : prof
                                 }
                               />

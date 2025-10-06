@@ -30,7 +30,8 @@ import Person from "../Components/Profile";
 import pdfIcon from "../assets/pdf-icon.png";
 import libraryDefault from "../assets/libraryDefault.png";
 
-const availableServices = [
+/* sample static data kept for UI fallback */
+const sampleAvailableServices = [
   { name: "medical", img: medical, desc: "Live Consultation Scheduling" },
   {
     name: "counselling",
@@ -50,7 +51,8 @@ const clientReviews = [
   { username: "Kuzo Music", prof: therapy, time: "10:04am" },
 ];
 
-const libResources = [
+/* sample library resources used only as fallback UI */
+const sampleLibResources = [
   {
     img: medical,
     username: "Bra Dennis",
@@ -69,70 +71,93 @@ const Home = () => {
   const [toggle, setToggle] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
-  const [libResources, setLibResources] = useState([]);
+  const [libResources, setLibResources] = useState([]); // state for fetched resources
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
   const { setChat, currentUser, setCurrentUser, profImage, setProfImage } =
     useContext(GlobalContext);
   const navigate = useNavigate();
+
+  // base API url (pointing at the route root used in your project)
+  const BASE_URL = import.meta.env.VITE_API_URL + "/knust.students/wellnesshub";
 
   const handleToggle = () => {
     setToggle(!toggle);
   };
 
   const handleLogOut = async () => {
-    const url = "http://localhost:3000/knust.students/wellnesshub/auth/logout";
-    const response = await axios.post(
-      url,
-      { _id: currentUser._id },
-      { withCredentials: true }
-    );
+    try {
+      const url = `${BASE_URL}/auth/logout`;
+      await axios.post(
+        url,
+        { _id: currentUser?._id },
+        { withCredentials: true }
+      );
 
-    setCurrentUser(null);
-    localStorage.removeItem("currentUser");
+      // clear frontend state
+      setCurrentUser(null);
+      localStorage.removeItem("currentUser");
+      setChat(null);
+      localStorage.removeItem("selectedChat");
 
-    setChat(null);
-    localStorage.removeItem("selectedChat");
-
-    navigate("/");
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      setErrorMsg("Logout failed. Try again.");
+    }
   };
+
+  // keep menu closed on desktop resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 767) {
-        // Desktop viewport
         setToggle(false);
       }
     };
-
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fetch profile image / user details
   useEffect(() => {
     const fetchDetails = async () => {
+      setLoadingProfile(true);
       try {
-        const result = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/userdetails",
-          { withCredentials: true }
-        );
+        const result = await axios.get(`${BASE_URL}/tasks/userdetails`, {
+          withCredentials: true,
+        });
 
-        setProfImage(result.data.img);
+        if (result?.data?.img) {
+          setProfImage(result.data.img);
+        } else if (result?.data) {
+          // if backend returns user object
+          if (result.data.img) setProfImage(result.data.img);
+        }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching user details:", error);
+        // set friendly error if session expired
+        if (error.response?.status === 401 || error.response?.status === 400) {
+          setErrorMsg(
+            "Session expired or unauthenticated. Please log in again."
+          );
+        }
+      } finally {
+        setLoadingProfile(false);
       }
     };
 
     fetchDetails();
+    // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // perform a search query
+  // handle input change for search box
   const handleSearchInputChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Debounce function definition
+  // general debounce helper
   const debounce = (func, wait) => {
     let timeout;
     return function (...args) {
@@ -141,46 +166,67 @@ const Home = () => {
       timeout = setTimeout(() => func.apply(context, args), wait);
     };
   };
-  // Function to fetch users with debounce
+
+  // fetch users safely using params (avoids building raw query string)
   const fetchUsers = useCallback(
     debounce(async (query) => {
       try {
-        const result = await axios.get(
-          `http://localhost:3000/knust.students/wellnesshub/tasks/getusers?search=${query}`,
-          { withCredentials: true }
-        );
-        setUsers(result.data);
+        const cleanQuery = query?.trim() || "";
+        const url = `${BASE_URL}/tasks/getusers`;
+
+        const response = await axios.get(url, {
+          params: { search: cleanQuery }, // axios will serialize correctly
+          withCredentials: true,
+        });
+
+        // backend may return array directly
+        setUsers(response.data || []);
       } catch (error) {
-        console.log(error);
+        // don't spam console if user clears the input; only log meaningful errors
+        if (error.response) {
+          // backend responded with an error status
+          console.error(
+            "fetchUsers response error:",
+            error.response.status,
+            error.response.data
+          );
+        } else {
+          console.error("fetchUsers network error:", error);
+        }
       }
     }, 300),
-    [] // Will be created only once
+    [] // created once
   );
 
+  // call fetchUsers whenever searchQuery changes
   useEffect(() => {
     fetchUsers(searchQuery);
   }, [searchQuery, fetchUsers]);
 
+  // fetch library resources (returns files array -> we slice to latest 3)
   useEffect(() => {
     const fetchLibraryResources = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/knust.students/wellnesshub/tasks/library/resources",
-          { withCredentials: true }
+          `${BASE_URL}/tasks/library/resources`,
+          {
+            withCredentials: true,
+          }
         );
-        const resources = response.data.files;
-        console.log(resources);
 
-        const latestResources = resources.slice(0, 3);
-
+        // backend may return { files: [...] } or return array directly
+        const files = response.data?.files ?? response.data ?? [];
+        const latestResources = Array.isArray(files) ? files.slice(0, 3) : [];
         setLibResources(latestResources);
       } catch (error) {
         console.error("Error fetching library resources:", error);
+        // fallback to sample resources so UI doesn't break
+        setLibResources(sampleLibResources);
       }
     };
 
     fetchLibraryResources();
-  }, []);
+  }, [BASE_URL]);
 
   const settings = {
     dots: true,
@@ -194,22 +240,24 @@ const Home = () => {
     <div className='home-page'>
       <div className='menu-updated'>
         <div className='menu-logo'>
-          <img src={logo} alt='' />
+          <img src={logo} alt='logo' />
         </div>
         <div className='menu-list-container'>
           <button
             onClick={handleToggle}
             style={{ border: "none", background: "transparent", color: "grey" }}
             className='toggle-menu'
+            aria-label='Toggle menu'
           >
             {!toggle ? (
-              <FaBars size={25} style={{ cursor: "pointer" }} />
+              <FaBars size={25} />
             ) : (
               <div className='fa-times'>
-                <FaTimes size={25} style={{ cursor: "pointer" }} />
+                <FaTimes size={25} />
               </div>
             )}
           </button>
+
           <div className={toggle ? "display" : "menu-list"}>
             <div className='list-items'>
               <NavLink
@@ -261,20 +309,29 @@ const Home = () => {
                 <img
                   src={
                     profImage
-                      ? `http://localhost:3000/profImages/${profImage}`
+                      ? `${
+                          import.meta.env.VITE_API_URL
+                        }/profImages/${profImage}`
                       : prof
                   }
-                  alt=''
+                  alt='profile'
                 />
               </div>
             </NavLink>
 
-            <div className='items itms-btns' onClick={handleLogOut}>
+            <div
+              className='items itms-btns'
+              onClick={handleLogOut}
+              style={{ cursor: "pointer" }}
+              role='button'
+              tabIndex={0}
+            >
               <FaSignOutAlt size={20} />
             </div>
           </div>
         </div>
       </div>
+
       <div className='main-page'>
         <div className='main-page-sub'>
           <div className='heading-txt'>
@@ -286,8 +343,7 @@ const Home = () => {
               <input
                 type='text'
                 name='search'
-                id=''
-                placeholder='Search for a doctor,a counsellor,or others'
+                placeholder='Search for a doctor, a counsellor, or others'
                 value={searchQuery}
                 onChange={handleSearchInputChange}
               />
@@ -297,13 +353,14 @@ const Home = () => {
             </div>
           </div>
 
-          {searchQuery && users.length > 0 && (
+          {/* show search results when there is a query and results exist */}
+          {searchQuery.trim() !== "" && users.length > 0 && (
             <div className='search-bar-display'>
               {users.map(({ username, img, _id, specialization }, index) => (
                 <div
                   className='users search-users'
                   style={{ cursor: "pointer" }}
-                  key={index}
+                  key={_id ?? index}
                   onClick={() => {
                     navigate("/Chatroom");
                   }}
@@ -311,7 +368,9 @@ const Home = () => {
                   <div className='single-user'>
                     <Person
                       img={
-                        img ? `http://localhost:3000/profImages/${img}` : prof
+                        img
+                          ? `${import.meta.env.VITE_API_URL}/profImages/${img}`
+                          : prof
                       }
                     />
                     <div className='msg-txt-time'>
@@ -327,15 +386,19 @@ const Home = () => {
           )}
 
           <div className='intro-txt'>
-            <p className='intro-trust'>trust us for your wellness</p>
+            <div className='intro-trust-wrap'>
+              <span className='intro-trust'>trust us for your wellness</span>
+            </div>
+
             <h3 className='intro-bold'>
               Let's get back your <span>physical and mental health </span> with
               our health care professionals
             </h3>
+
             <p className='intro-lorem'>
               Empower your journey to wellness with our all-in-one app, designed
               to nurture your mind, body, and soul. Discover personalized
-              guidance, track your progress, and unlock your full potential,one
+              guidance, track your progress, and unlock your full potential, one
               mindful step at a time.
             </p>
 
@@ -344,7 +407,7 @@ const Home = () => {
                 onClick={() =>
                   document
                     .getElementById("what-we-do")
-                    .scrollIntoView({ behavior: "smooth" })
+                    ?.scrollIntoView({ behavior: "smooth" })
                 }
               >
                 Our Services
@@ -363,10 +426,14 @@ const Home = () => {
           </div>
 
           <ul className='search-list available-ul'>
-            {availableServices.map((itms, index) => {
+            {sampleAvailableServices.map((itms, index) => {
               return (
                 <li className='available-list' key={index}>
-                  <img src={itms.img} alt='' className='available-img' />
+                  <img
+                    src={itms.img}
+                    alt={itms.name}
+                    className='available-img'
+                  />
                   <div className='job-titles-list'>
                     <p className='job-titles'>{itms.name}</p>
                     <p className='job-description'>{itms.desc}</p>
@@ -404,89 +471,106 @@ const Home = () => {
                 </p>
                 <p className='about-smaller-info '>
                   Locate us at the Knust hospital and our counselling offices
-                  accross all the various colleges for in-person medical and
+                  across all the various colleges for in-person medical and
                   counselling consultations respectively, not forgetting our
-                  live online sessions at the comfort of your homes
+                  live online sessions at the comfort of your homes.
                 </p>
               </div>
             </div>
           </div>
+
           <div className='library-blogs' style={{ width: "100%" }}>
             <p className='library-blogs-title'>resource library</p>
             <div className='library-blogs-header'>
               <p className='library-blogs-title-sub'>
                 check our resource library
               </p>
-              <div className='lib-button' onClick={() => navigate("/library")}>
-                <p>All Resources</p>
+              <div
+                className='lib-button'
+                onClick={() => navigate("/library")}
+                role='button'
+                tabIndex={0}
+              >
+                <span>All Resources</span>
                 <FaArrowRight />
               </div>
             </div>
 
-            {/* <div className='blogs-file-loop'>
-              {libResources.map(({ img, username, title, prof }, index) => {
-                return (
-                  <div className='blogs-file' key={index}>
-                    <div
-                      className='blogs-file-card'
-                      onClick={() => {
-                        setFileIndex(index);
-                        navigate("/singleResource");
-                      }}
-                    >
-                      <Video
-                  loop
-                  poster=''
-                  style={{ width: "100%", height: "250px" }}
-                >
-                  <source src={depressed} type='video/webm' />
-                </Video>
+            {/* Uncomment and use when you want to show the actual cards instead of the simple list */}
+            <div className='blogs-file-loop'>
+              {libResources.length > 0 ? (
+                libResources.map((res, index) => {
+                  // adapt to your resource object fields
+                  const img = res.img ?? res.thumbnail ?? libraryDefault;
+                  const title = res.title ?? res.filename ?? "Untitled";
+                  const username = res.username ?? res.uploader ?? "Unknown";
 
-                      <img
-                        src={img}
-                        alt=''
-                        style={{
-                          width: "100%",
-                          borderTopLeftRadius: "10px",
-                          borderTopRightRadius: "10px",
-                        }}
-                      />
-                    </div>
-                    <div className='file-txt'>
-                      <p
-                        className='file-txt-title'
-                        style={{
-                          cursor: "pointer",
-                          textAlign: "center",
-                          color: "white",
-                          fontSize: "1.5rem",
-                          fontWeight: "bold",
+                  return (
+                    <div className='blogs-file' key={res._id ?? index}>
+                      <div
+                        className='blogs-file-card'
+                        onClick={() => {
+                          // open single resource page; adapt as needed
+                          navigate("/singleResource", {
+                            state: { resource: res },
+                          });
                         }}
                       >
-                        {title}
-                      </p>
-
-                      <div className='blog-post-prof'>
-                        <div style={{ marginLeft: "20px" }}>
-                          <Person img={prof} />
-                        </div>
-
+                        <img
+                          src={img}
+                          alt={title}
+                          style={{
+                            width: "100%",
+                            borderTopLeftRadius: "10px",
+                            borderTopRightRadius: "10px",
+                          }}
+                        />
+                      </div>
+                      <div className='file-txt'>
                         <p
-                          className='file-txt-author'
+                          className='file-txt-title'
                           style={{
                             cursor: "pointer",
+                            textAlign: "center",
                             color: "white",
-                            paddingTop: "10px",
+                            fontSize: "1.2rem",
+                            fontWeight: "bold",
                           }}
                         >
-                          {username}
+                          {title}
                         </p>
+
+                        <div className='blog-post-prof'>
+                          <div style={{ marginLeft: "20px" }}>
+                            <Person img={prof} />
+                          </div>
+
+                          <span
+                            className='file-txt-author'
+                            style={{
+                              cursor: "pointer",
+                              color: "white",
+                              paddingTop: "10px",
+                            }}
+                          >
+                            {username}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div> */}
+                  );
+                })
+              ) : (
+                <div className='no-resources'>
+                  <img
+                    src={libraryDefault}
+                    alt='no resources'
+                    style={{ width: 120 }}
+                  />
+                  <p>No resources available yet.</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className='client-review'>
@@ -499,10 +583,10 @@ const Home = () => {
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit.
                 Corrupti debitis enim atque quae, reiciendis consectetur magni
                 officiis vel molestias veniam iusto natus at. Provident maxime
-                error, dignissimos repellat
+                error, dignissimos repellat.
               </p>
 
-              <div className='review-btn'>
+              <div className='review-btn' role='button' tabIndex={0}>
                 <div>discover all</div>
                 <FaArrowRight />
               </div>
@@ -525,7 +609,7 @@ const Home = () => {
                         <p>
                           Lorem ipsum dolor sit amet consectetur adipisicing
                           elit. Dolorem, provident harum unde sed non ea ipsum
-                          deserunt nostrum hic amet libero
+                          deserunt nostrum hic amet libero.
                         </p>
                         <div className='review-person'>
                           <Person img={prof} />
@@ -541,12 +625,14 @@ const Home = () => {
               </Slider>
             </div>
           </div>
+
           <div className='footer' style={{ width: "100%" }}>
-            <p>Kwame Nkrumah University of science and technology &copy;2024</p>
+            <p>Kwame Nkrumah University of Science and Technology &copy;2024</p>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default Home;
