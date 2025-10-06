@@ -1,0 +1,78 @@
+.check-appointment-logo {
+  display: flex;
+  gap: 20px;
+}
+
+.check-appointment-body {
+  margin-top: 100px;
+}
+
+.check-appointment-left-side {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  margin-top: 60px;
+  .unspaced {
+    cursor: pointer;
+    padding: 5px 20px;
+    height: 30px;
+  }
+
+  .spaced-minor {
+    border-bottom: 1px solid green;
+  }
+
+  .check-appointment-left-side-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .check-appointment-left-side-bottom {
+    margin-top: 50vh;
+    padding-inline: 20px;
+    padding-block: 10px;
+    background-color: green;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    color: white;
+    font-size: 1.1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+  }
+  .check-appointment-left-side-bottom:hover {
+    background-color: darkgreen;
+    color: white;
+  }
+}
+
+/* responsive mobile view */
+@media (max-width: 1023px) {
+  .check-appointment-left-side {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white;
+    gap: 20px;
+    flex-direction: row;
+    padding: 10px;
+
+    .check-appointment-left-side-top {
+      flex-direction: row;
+      gap: 15px;
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    .check-appointment-left-side-bottom {
+      margin-top: 15px;
+      margin-left: 50px;
+      background-color: transparent;
+      color: black;
+      border: 1px solid green;
+    }
+  }
+  .check-appointment-right-side {
+    padding-top: 30px;
+  }
+}
